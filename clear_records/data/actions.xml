@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="clear_all_records" model="ir.actions.server">
+        <field name="name">Delete All Transactional Records</field>
+        <field name="model_id" ref="product.model_product_product"/>
+        <field name="binding_model_id" ref="product.model_product_product"/>
+        <field name="state">code</field>
+        <field name="code">
+<![CDATA[
+env.cr.execute("UPDATE stock_move SET state='draft'")
+env.cr.execute("UPDATE stock_move_line SET state='draft'")
+env.cr.execute("UPDATE stock_picking SET state='draft'")
+env.cr.execute("UPDATE stock_inventory SET state='draft'")
+
+env["stock.move"].sudo().search([]).unlink()
+env["stock.picking"].sudo().search([]).unlink()
+env["stock.inventory"].sudo().search([]).unlink()
+
+env.cr.execute("TRUNCATE stock_quant CASCADE")
+env["stock.production.lot"].sudo().search([]).unlink()
+env["stock.quant.package"].sudo().search([]).unlink()
+env["stock.quant"].sudo().search([]).unlink()
+
+env.cr.execute("UPDATE sale_order SET state='draft'")
+env.cr.execute("UPDATE sale_order_line SET state='draft'")
+env["sale.order.line"].sudo().search([]).unlink()
+env["sale.order"].sudo().search([]).unlink()
+
+env.cr.execute("UPDATE purchase_order SET state='cancel'")
+env["purchase.order.line"].sudo().search([]).unlink()
+env["purchase.order"].sudo().search([]).unlink()
+
+env.cr.execute("UPDATE account_move SET state='draft'")
+
+move_ids = env["account.move.line"].sudo().search([])
+wiz_id = env["account.unreconcile"].sudo().create({})
+wiz_id.sudo().with_context(active_ids=[mv.id for mv in move_ids ]).trans_unrec()
+
+env["account.move.line"].sudo().search([]).unlink()
+env["account.move"].sudo().search([]).unlink()
+env["account.payment"].sudo().search([]).unlink()
+
+env.cr.execute("UPDATE account_bank_statement SET state='open'")
+env.cr.execute("UPDATE pos_order SET state='cancel'")
+env["account.bank.statement.line"].search([]).unlink()
+env["account.bank.statement"].search([]).unlink()
+env["pos.order.line"].sudo().search([]).unlink()
+env["pos.order"].sudo().search([]).unlink()
+
+env.cr.execute("UPDATE pos_session SET state='closed'")
+env["pos.session"].sudo().search([]).unlink()
+env["pos.config"].sudo().search([]).unlink()
+
+# archived_ids = env["product.template"].sudo().search([('active', '=', True)])
+# related_product_variants = archived_ids.mapped('product_variant_ids')
+# env["delivery.carrier"].sudo().search([('product_id', 'in', related_product_variants.ids)]).unlink()
+# env["stock.valuation.layer"].sudo().search([('product_tmpl_id', 'in', archived_ids.ids)]).unlink()
+# archived_ids.unlink()
+
+]]>
+    </field>
+    </record>
+</odoo>
