@@ -6,6 +6,9 @@
 
     'description': """
         [2492489]
+        action to unreserve quants
+        delete all sale, purchase, pos orders
+        delete all product quants    
         """,
 
     'author': 'Odoo Inc',
