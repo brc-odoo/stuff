@@ -1,0 +1,25 @@
+#! /bin/bash
+
+update_repo() {
+    CWD=${PWD}
+    COV=${PWD##*/}
+    GREEN="\033[1;32m"
+    BLUE="\u001b[34;1m"
+    RESET="\033[0m"
+
+    echo -e "${GREEN}Updating repo for Odoo Version $COV ${RESET}"
+
+    odoo_repos=enterprise,odoo
+    for repo in ${odoo_repos//,/ } 
+    do
+        echo -e "${BLUE}Updating $CWD/$repo to $COV ${RESET}"
+        cd $CWD/$repo
+        git checkout .
+        find . -name \*.pyc -delete
+        git clean -fd
+        git pull
+        git checkout origin/$COV
+        cd ..
+    done
+    echo -e "${GREEN}$COV updated ${RESET}"
+}

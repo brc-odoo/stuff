@@ -1,0 +1,8 @@
+[tool.isort]
+line_length = 120
+sections = ['FUTURE', 'STDLIB', 'THIRDPARTY', 'FIRSTPARTY', 'ODOOADDONS', 'LOCALFOLDER']
+known_first_party = ["odoo", "openerp"]
+known_odooaddons = ["odoo.addons", "openerp.addons"]
+multi_line_output = 7
+remove_imports = ["pudb", "pdb"]
+skip = ["__init__.py"]
